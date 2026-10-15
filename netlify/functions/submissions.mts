@@ -9,7 +9,14 @@ import type { Context } from "@netlify/functions";
 
 export default async (req: Request, context: Context) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 204 });
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "x-admin-password, content-type",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+      },
+    });
   }
 
   if (req.method !== "GET") {
@@ -49,12 +56,9 @@ export default async (req: Request, context: Context) => {
   const limit = Math.min(Number(url.searchParams.get("limit") || 50), 100);
 
   try {
-    // 1) Find form id for "propostas"
     const formsRes = await fetch(
       `https://api.netlify.com/api/v1/sites/${siteId}/forms`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
+      { headers: { Authorization: `Bearer ${token}` } }
     );
     if (!formsRes.ok) {
       const t = await formsRes.text();
@@ -73,12 +77,9 @@ export default async (req: Request, context: Context) => {
       });
     }
 
-    // 2) List submissions
     const subRes = await fetch(
       `https://api.netlify.com/api/v1/forms/${form.id}/submissions?per_page=${limit}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
+      { headers: { Authorization: `Bearer ${token}` } }
     );
     if (!subRes.ok) {
       const t = await subRes.text();
@@ -88,7 +89,14 @@ export default async (req: Request, context: Context) => {
       );
     }
     const submissions = await subRes.json();
-    return Response.json({ submissions });
+    return Response.json(
+      { submissions },
+      {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    );
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return Response.json({ error: message }, { status: 500 });
