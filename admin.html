@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin · B.S Drinks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #070707;
+    --graphite: #141414;
+    --offwhite: #f7f2ea;
+    --champagne: #d4af37;
+    --copper: #b87333;
+    --gray: #8a8a8a;
+    --success: #4caf50;
+    --danger: #e57373;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--black);
+    color: var(--offwhite);
+    min-height: 100vh;
+  }
+  h1, h2 { font-family: 'Cormorant Garamond', serif; font-weight: 500; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem; }
+
+  #loginScreen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+  .login-card {
+    background: linear-gradient(145deg, #141210, #0f0e0c);
+    border: 1px solid rgba(212,175,55,0.2);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+  }
+  .login-card h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0.3rem;
+    color: var(--champagne);
+  }
+  .login-card p { color: var(--gray); font-size: 0.9rem; margin-bottom: 1.8rem; }
+  .login-card input {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: #0a0a0a;
+    color: var(--offwhite);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  .login-card input:focus {
+    outline: none;
+    border-color: var(--champagne);
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.6rem;
+    border-radius: 12px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.25s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--champagne), var(--copper));
+    color: #070707;
+    width: 100%;
+  }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--gray);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .btn-ghost:hover { border-color: var(--champagne); color: var(--offwhite); }
+  .error { color: var(--danger); font-size: 0.85rem; margin-top: 0.8rem; display: none; }
+
+  #dash { display: none; }
+  header.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  header.admin-header h1 { font-size: 1.9rem; color: var(--champagne); }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: #12100e;
+    border: 1px solid rgba(212,175,55,0.12);
+    border-radius: 14px;
+    padding: 1.2rem;
+    text-align: center;
+  }
+  .stat-card .num { font-size: 1.8rem; font-weight: 600; color: var(--champagne); }
+  .stat-card .lbl { font-size: 0.8rem; color: var(--gray); margin-top: 0.2rem; }
+
+  .toolbar {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .list { display: flex; flex-direction: column; gap: 1rem; }
+  .card {
+    background: linear-gradient(145deg, #141210, #0f0e0c);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 1.4rem 1.3rem;
+    transition: border-color 0.25s;
+  }
+  .card:hover { border-color: rgba(212,175,55,0.25); }
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+  }
+  .card-top h3 { font-size: 1.15rem; color: var(--offwhite); }
+  .badge {
+    font-size: 0.72rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(212,175,55,0.15);
+    color: var(--champagne);
+    white-space: nowrap;
+  }
+  .meta { font-size: 0.85rem; color: var(--gray); line-height: 1.6; }
+  .meta strong { color: #e8d5a3; font-weight: 500; }
+  .details {
+    margin-top: 0.9rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-size: 0.85rem;
+    color: #bbb;
+    display: none;
+  }
+  .card.open .details { display: block; }
+  .toggle {
+    margin-top: 0.7rem;
+    font-size: 0.8rem;
+    color: var(--champagne);
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+  .empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--gray);
+  }
+  .loading { text-align: center; padding: 2rem; color: var(--gray); }
+  a.wa {
+    color: #25d366;
+    text-decoration: none;
+  }
+  a.wa:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-card">
+    <h1>B.S Drinks</h1>
+    <p>Área administrativa</p>
+    <input type="password" id="pwd" placeholder="Senha de acesso" autocomplete="current-password">
+    <button class="btn btn-primary" onclick="doLogin()">Entrar</button>
+    <p class="error" id="loginError">Senha incorreta ou erro de conexão</p>
+  </div>
+</div>
+
+<div id="dash">
+  <div class="wrap">
+    <header class="admin-header">
+      <h1>Propostas recebidas</h1>
+      <div style="display:flex;gap:0.6rem">
+        <button class="btn btn-ghost" onclick="loadSubs()">Atualizar</button>
+        <button class="btn btn-ghost" onclick="logout()">Sair</button>
+      </div>
+    </header>
+
+    <div class="stats">
+      <div class="stat-card"><div class="num" id="statTotal">—</div><div class="lbl">Total</div></div>
+      <div class="stat-card"><div class="num" id="statToday">—</div><div class="lbl">Hoje</div></div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn btn-ghost" onclick="loadSubs()">Recarregar lista</button>
+    </div>
+
+    <div id="list" class="list">
+      <div class="loading">Carregando...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'bs_admin_pwd';
+let adminPwd = sessionStorage.getItem(STORAGE_KEY) || '';
+
+function doLogin() {
+  const p = document.getElementById('pwd').value.trim();
+  if (!p) return;
+  adminPwd = p;
+  sessionStorage.setItem(STORAGE_KEY, p);
+  document.getElementById('loginError').style.display = 'none';
+  showDash();
+  loadSubs();
+}
+
+function logout() {
+  sessionStorage.removeItem(STORAGE_KEY);
+  adminPwd = '';
+  document.getElementById('dash').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('pwd').value = '';
+}
+
+function showDash() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dash').style.display = 'block';
+}
+
+async function loadSubs() {
+  const list = document.getElementById('list');
+  list.innerHTML = '<div class="loading">Carregando propostas...</div>';
+  try {
+    const res = await fetch('/.netlify/functions/submissions?limit=50', {
+      headers: { 'x-admin-password': adminPwd }
+    });
+    const data = await res.json();
+    if (res.status === 401) {
+      document.getElementById('loginError').style.display = 'block';
+      logout();
+      return;
+    }
+    if (!res.ok) {
+      list.innerHTML = `<div class="empty">${data.error || 'Erro ao carregar'}<br><small>${data.detail || data.message || ''}</small></div>`;
+      return;
+    }
+    const subs = data.submissions || [];
+    document.getElementById('statTotal').textContent = subs.length;
+    const today = new Date().toISOString().slice(0, 10);
+    const todayCount = subs.filter(s => (s.created_at || '').startsWith(today)).length;
+    document.getElementById('statToday').textContent = todayCount;
+
+    if (!subs.length) {
+      list.innerHTML = '<div class="empty">Nenhuma proposta ainda.<br>Envie um pedido de teste pelo site.</div>';
+      return;
+    }
+
+    list.innerHTML = subs.map((s, i) => {
+      const d = s.data || s;
+      const nome = d.nome || d.name || '—';
+      const whats = (d.whatsapp || d.telefone || '').replace(/\D/g, '');
+      const tipo = d.tipoEvento || d.tipo || d['tipo-evento'] || '—';
+      const dataEv = d.dataEvento || d.data || '—';
+      const convidados = d.convidados || d.qtd || '—';
+      const cidade = d.cidade || '';
+      const created = s.created_at ? new Date(s.created_at).toLocaleString('pt-BR') : '';
+      const waLink = whats ? `https://wa.me/55${whats}` : '#';
+      const allKeys = Object.keys(d).filter(k => !['bot-field','form-name'].includes(k));
+      const details = allKeys.map(k => `<div><strong>${k}:</strong> ${escapeHtml(String(d[k] ?? ''))}</div>`).join('');
+
+      return `
+      <div class="card" id="card-${i}">
+        <div class="card-top">
+          <h3>${escapeHtml(nome)}</h3>
+          <span class="badge">${escapeHtml(tipo)}</span>
+        </div>
+        <div class="meta">
+          ${whats ? `<div>📱 <a class="wa" href="${waLink}" target="_blank" rel="noopener">${escapeHtml(d.whatsapp || whats)}</a></div>` : ''}
+          <div>📅 Evento: <strong>${escapeHtml(dataEv)}</strong> · ${escapeHtml(String(convidados))} convidados</div>
+          ${cidade ? `<div>📍 ${escapeHtml(cidade)}</div>` : ''}
+          ${created ? `<div style="margin-top:0.3rem;opacity:0.7">Recebido: ${created}</div>` : ''}
+        </div>
+        <button class="toggle" onclick="toggleCard(${i})">Ver todos os detalhes</button>
+        <div class="details">${details}</div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    list.innerHTML = `<div class="empty">Erro de conexão: ${e.message}</div>`;
+  }
+}
+
+function toggleCard(i) {
+  document.getElementById('card-' + i).classList.toggle('open');
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
+}
+
+if (adminPwd) {
+  showDash();
+  loadSubs();
+}
+
+document.getElementById('pwd').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+</script>
+</body>
+</html>
